@@ -24,7 +24,7 @@
           user, and adding that card to the DOM.
 */
 
-const followersArray = [];
+
 
 /* Step 3: Create a function that accepts a single object as its only argument,
           Using DOM methods and properties, create a component that will return the following DOM element:
@@ -53,3 +53,69 @@ const followersArray = [];
   luishrd
   bigknell
 */
+
+const followersArray = ["tetondan","dustinmyers","justsml","luishrd","bigknell"];
+
+window.addEventListener("load", function(event) {
+
+  axios.get(`https://api.github.com/users/pusheadmetal`).then((response) => {
+    
+    let getProfile = createProfile(response);
+    document.querySelector(".cards").appendChild(getProfile);
+
+  });
+
+  followersArray.forEach( (item) => {
+    axios.get(`https://api.github.com/users/${item}`).then((response) => {
+      let getProfile = createProfile(response);
+      document.querySelector(".cards").appendChild(getProfile);
+    })
+  })
+
+  
+
+  function createProfile(response){
+    //Create Elements
+      let newOutsideDiv = document.createElement("div");
+      let newImg = document.createElement("img");
+      let newInsideDiv = document.createElement("div");
+      let newH3 = document.createElement("h3");
+      let p = [];
+      for (let i = 0; i < 6; i++){
+        p[i] = document.createElement("p");
+      }
+      let newAnchor = document.createElement("a");
+    //Assign Classes
+      newOutsideDiv.classList.add("card");
+      newInsideDiv.classList.add("card-info");
+      newH3.classList.add("name");
+      p[0].classList.add("username");
+    //Assign Data
+      newImg.src = response.data.avatar_url;
+      newH3.textContent = response.data.name;
+      p[0].textContent = response.data.login;
+      if (response.data.location === null){
+        p[1].textContent = `Location: Unknown`;
+      }else{
+        p[1].textContent = `Location: ${response.data.location}`;
+      }
+      p[2].textContent = `Profile: `;
+      p[3].textContent = `Followers: ${response.data.followers}`;
+      p[4].textContent = `Following: ${response.data.following}`;
+      p[5].textContent = `Bio: ${response.data.bio}`;
+      newAnchor.href = response.data.html_url;
+      newAnchor.textContent = response.data.html_url;
+    //Append
+      newInsideDiv.appendChild(newH3);
+      p[2].appendChild(newAnchor);
+      for (i = 0; i < 6; i++){
+        newInsideDiv.appendChild(p[i]);
+      }
+      newOutsideDiv.appendChild(newImg);
+      newOutsideDiv.appendChild(newInsideDiv);
+    //Return
+      return newOutsideDiv;
+  }
+  
+
+})
